@@ -90,14 +90,14 @@ export async function fetchTides() {
     `&station=${CONFIG.NOAA_STATION}&product=predictions&datum=MLLW` +
     `&time_zone=lst_ldt&interval=hilo&units=english&format=json`;
 
-  const [levelsRes, hiloRes] = await Promise.all([
+  const [levelsResult, hiloResult] = await Promise.allSettled([
     fetch(levelsUrl),
     fetch(hiloUrl),
   ]);
 
   let currentLevel = null;
-  if (levelsRes.ok) {
-    const ld = await levelsRes.json();
+  if (levelsResult.status === 'fulfilled' && levelsResult.value.ok) {
+    const ld = await levelsResult.value.json().catch(() => ({}));
     const readings = ld.data;
     if (readings?.length) {
       const last = readings[readings.length - 1];
@@ -106,8 +106,8 @@ export async function fetchTides() {
   }
 
   let tides = [];
-  if (hiloRes.ok) {
-    const hd = await hiloRes.json();
+  if (hiloResult.status === 'fulfilled' && hiloResult.value.ok) {
+    const hd = await hiloResult.value.json().catch(() => ({}));
     tides = (hd.predictions || []).slice(0, 4).map((t) => ({
       time: t.t,
       height: parseFloat(t.v),

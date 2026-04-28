@@ -361,8 +361,18 @@ function showError(msg) {
 }
 
 // Simple Markdown → HTML (subset: bold, headers, lists, line breaks)
+// Content is first HTML-escaped to prevent XSS, then safe markdown patterns applied
 function markdownToHtml(md) {
-  return md
+  // Step 1: escape all HTML entities
+  const safe = md
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  // Step 2: apply safe markdown transformations on the already-escaped string
+  return safe
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/^#{3}\s+(.+)$/gm, '<h4>$1</h4>')
     .replace(/^#{2}\s+(.+)$/gm, '<h3>$1</h3>')
@@ -481,7 +491,12 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#viewer-close')?.addEventListener('click', () => {
     hide($('#viewer-modal'));
     const iframe = $('#viewer-iframe');
-    if (iframe) { URL.revokeObjectURL(iframe.src); iframe.src = ''; }
+    if (iframe) {
+      const src = iframe.src;
+      iframe.src = '';
+      // Revoke after a short delay so the iframe has time to stop loading
+      setTimeout(() => { try { URL.revokeObjectURL(src); } catch (_) {} }, 200);
+    }
   });
 
   // Close modals on overlay click
@@ -490,7 +505,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === overlay) {
         hide(overlay);
         const iframe = overlay.querySelector('iframe');
-        if (iframe) { URL.revokeObjectURL(iframe.src); iframe.src = ''; }
+        if (iframe) {
+          const src = iframe.src;
+          iframe.src = '';
+          setTimeout(() => { try { URL.revokeObjectURL(src); } catch (_) {} }, 200);
+        }
       }
     });
   });

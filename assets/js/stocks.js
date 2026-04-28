@@ -12,7 +12,7 @@ export async function fetchQuotes(symbols, apiKey) {
   if (!apiKey) return [];
 
   const results = [];
-  // Alpha Vantage free tier: sequential fetches to avoid rate limiting
+  // Alpha Vantage free tier: ~5 requests/minute — add 250ms delay between calls
   for (const symbol of symbols.slice(0, 5)) {
     try {
       const url =
@@ -35,6 +35,8 @@ export async function fetchQuotes(symbols, apiKey) {
     } catch (_) {
       // skip failed symbol
     }
+    // Pause between requests to respect rate limits
+    await new Promise((r) => setTimeout(r, 250));
   }
   return results;
 }

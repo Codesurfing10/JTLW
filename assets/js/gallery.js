@@ -91,7 +91,12 @@ export class Gallery {
       null,
       2
     );
-    const encoded = btoa(unescape(encodeURIComponent(content)));
+    // Encode content to base64 using TextEncoder for proper UTF-8 support
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(content);
+    let binary = '';
+    bytes.forEach((b) => { binary += String.fromCharCode(b); });
+    const encoded = btoa(binary);
 
     // Get current SHA (if file exists) to allow update
     let sha;
