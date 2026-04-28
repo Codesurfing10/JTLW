@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="JTLW — Voice-activated AI agent: stock picks, San Diego sailing conditions, and interactive 3D innovations powered by Gemini Flash." />
+  <meta name="theme-color" content="#0a0e1a" />
+  <title>JTLW Agent</title>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="JTLW Agent" />
+  <meta property="og:description" content="Voice-activated AI agent: stocks · NOAA sailing · interactive 3D innovations" />
+  <meta property="og:type" content="website" />
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>" />
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🌊</div>
+    <h1>JTLW <span class="logo-sub">AI Agent</span></h1>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="settings-btn" title="Settings (API Keys)">⚙️</button>
+    <button class="icon-btn" id="help-btn" title="Help">❓</button>
+  </div>
+</header>
+
+<!-- ── Main ───────────────────────────────────────────────────────────────── -->
+<main>
+
+  <!-- Agent Hero Panel -->
+  <section class="agent-hero">
+    <div id="status-badge" class="status-badge">
+      <span class="dot"></span> Ready
+    </div>
+
+    <div class="mic-wrap">
+      <button class="mic-btn" id="mic-btn" title="Click to speak (or press Space)">🎤</button>
+      <span class="mic-ring"></span>
+      <span class="mic-ring"></span>
+    </div>
+
+    <div class="waveform" id="waveform">
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+
+    <div class="transcript-box" id="transcript-box">Click the mic or press Space to speak…</div>
+
+    <div class="response-panel">
+      <div class="response-card" id="response-card">
+        <div class="response-header">
+          <div class="agent-avatar">🤖</div>
+          <strong>JTLW</strong>
+        </div>
+        <div class="response-body" id="response-body"></div>
+      </div>
+    </div>
+
+    <!-- Quick-start suggestion chips -->
+    <div class="suggestions">
+      <button class="suggestion-chip" data-cmd="JTLW, give me the top 5 stock picks from today's scanner">📈 Top 5 Stock Picks</button>
+      <button class="suggestion-chip" data-cmd="JTLW, what are the sailing conditions in San Diego right now?">⛵ San Diego Sailing</button>
+      <button class="suggestion-chip" data-cmd="JTLW, build me an F1 race car with interactive 3D components">🏎️ F1 Race Car 3D</button>
+      <button class="suggestion-chip" data-cmd="JTLW, what are today's weather and tide conditions in San Diego?">🌊 Weather &amp; Tides</button>
+      <button class="suggestion-chip" data-cmd="JTLW, build me a rotating 3D Earth with atmosphere and cloud layers">🌍 3D Earth</button>
+      <button class="suggestion-chip" data-cmd="JTLW, create an interactive 3D solar system model">🪐 Solar System 3D</button>
+    </div>
+  </section>
+
+  <!-- ── Stocks Data Section ──────────────────────────────────────────────── -->
+  <section class="data-section" id="stocks-section">
+    <div class="section-title">📈 Top 5 Stock Picks</div>
+    <div class="stocks-grid" id="stocks-grid"></div>
+  </section>
+
+  <!-- ── Weather / Sailing Data Section ──────────────────────────────────── -->
+  <section class="data-section" id="weather-section">
+    <div class="section-title">🌊 San Diego Conditions — via NOAA</div>
+    <div id="weather-container"></div>
+  </section>
+
+  <!-- ── Innovations Gallery ──────────────────────────────────────────────── -->
+  <section class="gallery-section">
+    <div class="gallery-header">
+      <h2>🔬 Innovations Gallery</h2>
+      <button class="btn btn-secondary" id="clear-gallery-btn" title="Clear all saved innovations">🗑️ Clear All</button>
+    </div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+  </section>
+
+</main>
+
+<!-- ── Settings Modal ──────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">⚙️ Settings</span>
+      <button class="close-btn" id="settings-close">✕</button>
+    </div>
+
+    <div class="settings-group">
+      <label for="input-gemini-key">Gemini API Key <span style="color:var(--accent-red)">*</span></label>
+      <input class="settings-input" type="password" id="input-gemini-key" placeholder="AIza…" autocomplete="off" />
+      <p class="hint">Required. Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--accent-primary)">aistudio.google.com</a>. Stored only in your browser.</p>
+    </div>
+
+    <div class="settings-group">
+      <label for="input-av-key">Alpha Vantage Key <span style="color:var(--text-muted)">(optional)</span></label>
+      <input class="settings-input" type="password" id="input-av-key" placeholder="Your Alpha Vantage API key" autocomplete="off" />
+      <p class="hint">Enables live stock quotes. Free key at <a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noopener" style="color:var(--accent-primary)">alphavantage.co</a>. Without it, Gemini provides AI-based analysis only.</p>
+    </div>
+
+    <div class="settings-group">
+      <label for="input-github-token">GitHub Token <span style="color:var(--text-muted)">(optional)</span></label>
+      <input class="settings-input" type="password" id="input-github-token" placeholder="ghp_…" autocomplete="off" />
+      <p class="hint">Enables syncing the Innovations Gallery to your repo. Needs <code>contents: write</code> scope.</p>
+    </div>
+
+    <div class="settings-group">
+      <label for="input-github-repo">GitHub Repo <span style="color:var(--text-muted)">(optional)</span></label>
+      <input class="settings-input" type="text" id="input-github-repo" placeholder="owner/repo (e.g. Codesurfing10/JTLW)" autocomplete="off" />
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-check">
+        <input type="checkbox" id="input-speech" checked />
+        <label for="input-speech" style="text-transform:none;letter-spacing:0;font-size:.9rem;font-weight:400;color:var(--text-primary)">
+          Enable spoken responses (text-to-speech)
+        </label>
+      </div>
+    </div>
+
+    <div class="settings-actions">
+      <button class="btn btn-secondary" id="settings-close2">Cancel</button>
+      <button class="btn btn-primary" id="settings-save">💾 Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Innovation Viewer Modal ─────────────────────────────────────────────── -->
+<div class="modal-overlay" id="viewer-modal">
+  <div class="modal-box viewer-modal-box">
+    <div class="viewer-header">
+      <span class="viewer-title" id="viewer-title">Innovation</span>
+      <button class="close-btn" id="viewer-close">✕</button>
+    </div>
+    <iframe class="viewer-iframe" id="viewer-iframe" sandbox="allow-scripts" title="Innovation Viewer"></iframe>
+  </div>
+</div>
+
+<!-- ── Help Modal ──────────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="help-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">❓ How to Use JTLW</span>
+      <button class="close-btn" id="help-close">✕</button>
+    </div>
+    <div style="line-height:1.8;color:var(--text-secondary);font-size:.9rem">
+      <p style="margin-bottom:1rem"><strong style="color:var(--text-primary)">JTLW</strong> is a voice-activated AI agent powered by <strong style="color:var(--accent-primary)">Google Gemini 1.5 Flash</strong>.</p>
+
+      <h4 style="color:var(--accent-primary);margin-bottom:.5rem">🚀 Getting Started</h4>
+      <ol style="padding-left:1.3rem;margin-bottom:1rem">
+        <li>Click <strong>⚙️ Settings</strong> and add your Gemini API key (free at aistudio.google.com)</li>
+        <li>Click the <strong>🎤 microphone</strong> button or press <strong>Space</strong></li>
+        <li>Speak your command — results appear instantly</li>
+      </ol>
+
+      <h4 style="color:var(--accent-primary);margin-bottom:.5rem">💬 Example Commands</h4>
+      <ul style="padding-left:1.3rem;margin-bottom:1rem">
+        <li><em>"JTLW, top 5 stock picks from today's scanner"</em></li>
+        <li><em>"What are the sailing conditions in San Diego?"</em></li>
+        <li><em>"Build me an F1 race car with interactive 3D components"</em></li>
+        <li><em>"Create a 3D solar system model"</em></li>
+        <li><em>"What are current weather and tide conditions?"</em></li>
+      </ul>
+
+      <h4 style="color:var(--accent-primary);margin-bottom:.5rem">🔬 Innovations Gallery</h4>
+      <p>Every response is automatically saved to the gallery below the agent panel. 3D creative results are interactive — click <strong>View 3D</strong> to open them full-screen.</p>
+
+      <h4 style="color:var(--accent-primary);margin:.75rem 0 .5rem">🌊 Data Sources</h4>
+      <ul style="padding-left:1.3rem">
+        <li>Weather &amp; Tides: <strong>NOAA APIs</strong> (no key required)</li>
+        <li>Stocks: <strong>Alpha Vantage</strong> (optional key) + Gemini AI analysis</li>
+        <li>3D Graphics: <strong>Three.js</strong> generated by Gemini</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast Container ─────────────────────────────────────────────────────── -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ── Scripts ─────────────────────────────────────────────────────────────── -->
+<script type="module" src="assets/js/agent.js"></script>
+
+<script>
+  // Inline wiring for secondary modal buttons not covered by agent.js
+  document.getElementById('help-btn').addEventListener('click', () => {
+    document.getElementById('help-modal').classList.add('visible');
+  });
+  document.getElementById('help-close').addEventListener('click', () => {
+    document.getElementById('help-modal').classList.remove('visible');
+  });
+  document.getElementById('settings-close2')?.addEventListener('click', () => {
+    document.getElementById('settings-modal').classList.remove('visible');
+  });
+  document.getElementById('clear-gallery-btn')?.addEventListener('click', () => {
+    if (confirm('Delete ALL saved innovations? This cannot be undone.')) {
+      window.jtlw?.clearGallery?.();
+    }
+  });
+</script>
+
+</body>
+</html>
